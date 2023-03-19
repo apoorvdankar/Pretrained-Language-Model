@@ -21,6 +21,7 @@ import logging
 import os
 import unicodedata
 from io import open
+from .file_utils import cached_path
 
 
 logger = logging.getLogger(__name__)
@@ -162,8 +163,9 @@ class BertTokenizer(object):
         """
 
         # assert pretrained_model_name_or_path in PRETRAINED_VOCAB_ARCHIVE_MAP
-        resolved_vocab_file = os.path.join(pretrained_model_name_or_path, 'vocab.txt')
-
+        resolved_vocab_file = PRETRAINED_VOCAB_ARCHIVE_MAP.get(pretrained_model_name_or_path, os.path.join(pretrained_model_name_or_path, 'vocab.txt'))
+        resolved_vocab_file = cached_path(resolved_vocab_file)
+        
         max_len = 512
         kwargs['max_len'] = min(kwargs.get('max_len', int(1e12)), max_len)
         # Instantiate tokenizer.

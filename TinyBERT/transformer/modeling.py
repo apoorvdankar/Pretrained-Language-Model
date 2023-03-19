@@ -27,6 +27,7 @@ import tarfile
 import tempfile
 import sys
 from io import open
+from .file_utils import cached_path
 
 import torch
 import torch.nn.functional as F
@@ -681,17 +682,56 @@ class BertPreTrainedModel(nn.Module):
         kwargs.pop('state_dict', None)
         from_tf = kwargs.get('from_tf', False)
         kwargs.pop('from_tf', None)
+        cache_dir = kwargs.get('cache_dir', None)
 
         # Load config
-        config_file = os.path.join(pretrained_model_name_or_path, CONFIG_NAME)
+        
+        if pretrained_model_name_or_path in PRETRAINED_MODEL_ARCHIVE_MAP:
+            archive_file = PRETRAINED_MODEL_ARCHIVE_MAP[pretrained_model_name_or_path]
+        else:
+            archive_file = pretrained_model_name_or_path
+        # redirect to the cache, if necessary
+        try:
+            resolved_archive_file = cached_path(archive_file, cache_dir=cache_dir)
+        except EnvironmentError:
+            logger.error(
+                "Model name '{}' was not found in model name list ({}). "
+                "We assumed '{}' was a path or url but couldn't find any file "
+                "associated to this path or url.".format(
+                    pretrained_model_name_or_path,
+                    ', '.join(PRETRAINED_MODEL_ARCHIVE_MAP.keys()),
+                    archive_file))
+            return None
+        if resolved_archive_file == archive_file:
+            logger.info("loading archive file {}".format(archive_file))
+        else:
+            logger.info("loading archive file {} from cache at {}".format(
+                archive_file, resolved_archive_file))
+        tempdir = None
+        if os.path.isdir(resolved_archive_file) or from_tf:
+            serialization_dir = resolved_archive_file
+        else:
+            # Extract archive to temp dir
+            tempdir = tempfile.mkdtemp()
+            logger.info("extracting archive file {} to temp dir {}".format(
+                resolved_archive_file, tempdir))
+            with tarfile.open(resolved_archive_file, 'r:gz') as archive:
+                archive.extractall(tempdir)
+            serialization_dir = tempdir
+        # Load config
+        config_file = os.path.join(serialization_dir, CONFIG_NAME)
+        if not os.path.exists(config_file):
+            # Backward compatibility with old naming format
+            config_file = os.path.join(serialization_dir, BERT_CONFIG_NAME)
         config = BertConfig.from_json_file(config_file)
         logger.info("Model config {}".format(config))
         # Instantiate model.
 
         model = cls(config, *inputs, **kwargs)
         if state_dict is None and not from_tf:
-            weights_path = os.path.join(
-                pretrained_model_name_or_path, WEIGHTS_NAME)
+            # weights_path = os.path.join(
+            #     pretrained_model_name_or_path, WEIGHTS_NAME)
+            weights_path = os.path.join(serialization_dir, WEIGHTS_NAME)
             logger.info("Loading model {}".format(weights_path))
             state_dict = torch.load(weights_path, map_location='cpu')
 
