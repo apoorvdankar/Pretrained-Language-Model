@@ -26,6 +26,7 @@ import logging
 import os
 import random
 import sys
+import wandb
 
 import numpy as np
 import torch
@@ -740,6 +741,12 @@ def main():
     parser.add_argument('--temperature',
                         type=float,
                         default=1.)
+    parser.add_argument('--wandb_username',
+                        type=str,
+                        default='username')
+    parser.add_argument('--wandb_runname',
+                        type=str,
+                        default='runname')                                                
 
     args = parser.parse_args()
     logger.info('The args: {}'.format(args))
@@ -815,7 +822,7 @@ def main():
 
     if not args.pred_distill and not args.do_eval:
         if task_name in default_params:
-            args.num_train_epoch = default_params[task_name]["num_train_epochs"]
+            args.num_train_epochs = default_params[task_name]["num_train_epochs"]
 
     if task_name not in processors:
         raise ValueError("Task not found: %s" % task_name)
@@ -824,6 +831,10 @@ def main():
     output_mode = output_modes[task_name]
     label_list = processor.get_labels()
     num_labels = len(label_list)
+
+    wandb.init(name=f"{args.wandb_runname}_predict_{args.pred_distill}",
+                project="csc2516_project",
+                entity=args.wandb_username)
 
     tokenizer = BertTokenizer.from_pretrained(args.student_model, do_lower_case=args.do_lower_case)
 
@@ -859,6 +870,8 @@ def main():
 
     student_model = TinyBertForSequenceClassification.from_pretrained(args.student_model, num_labels=num_labels)
     student_model.to(device)
+    wandb.watch(student_model)
+
     if args.do_eval:
         logger.info("***** Running evaluation *****")
         logger.info("  Num examples = %d", len(eval_examples))
@@ -945,6 +958,8 @@ def main():
                     layers_per_block = int(teacher_layer_num / student_layer_num)
                     new_teacher_atts = [teacher_atts[i * layers_per_block + layers_per_block - 1]
                                         for i in range(student_layer_num)]
+                    # new_teacher_atts = [teacher_atts[random.randint(i * layers_per_block, i * layers_per_block + layers_per_block - 1)] 
+                    #                     for i in range(student_layer_num)]
 
                     for student_att, teacher_att in zip(student_atts, new_teacher_atts):
                         student_att = torch.where(student_att <= -1e2, torch.zeros_like(student_att).to(device),
@@ -1086,6 +1101,10 @@ def main():
                             mox.file.copy_parallel('.', args.data_url)
 
                     student_model.train()
+
+            wandb.log(result)
+
+    wandb.finish()
 
 
 if __name__ == "__main__":
