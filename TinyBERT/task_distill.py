@@ -646,8 +646,8 @@ def do_eval(model, task_name, eval_dataloader,
 
     return result
 
+def parse_arguments():
 
-def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_dir",
                         default=None,
@@ -668,7 +668,7 @@ def main():
                         type=str,
                         required=True,
                         help="The name of the task to train.")
-    parser.add_argument("--output_dir",
+    parser.add_argument("--output_dir_original",
                         default=None,
                         type=str,
                         required=True,
@@ -741,6 +741,8 @@ def main():
     parser.add_argument('--temperature',
                         type=float,
                         default=1.)
+    parser.add_argument('--use_wandb',
+                        action='store_true')
     parser.add_argument('--wandb_username',
                         type=str,
                         default='username')
@@ -750,6 +752,16 @@ def main():
 
     args = parser.parse_args()
     logger.info('The args: {}'.format(args))
+    return args
+
+def main():
+
+    if args.use_wandb:
+        run = wandb.init()
+        
+        args.learning_rate = wandb.config.lr
+        args.train_batch_size = wandb.config.batch_size
+        run.name = f"{args.wandb_runname}_{args.learning_rate}_{args.train_batch_size}_predict_{args.pred_distill}"
 
     processors = {
         "cola": ColaProcessor,
@@ -785,7 +797,7 @@ def main():
         "sts-b": {"num_train_epochs": 20, "max_seq_length": 128},
         "qqp": {"num_train_epochs": 5, "max_seq_length": 128},
         "qnli": {"num_train_epochs": 10, "max_seq_length": 128},
-        "rte": {"num_train_epochs": 20, "max_seq_length": 128}
+        "rte": {"num_train_epochs": 10, "max_seq_length": 128}
     }
 
     acc_tasks = ["mnli", "mrpc", "sst-2", "qqp", "qnli", "rte"]
@@ -810,6 +822,9 @@ def main():
         torch.cuda.manual_seed_all(args.seed)
 
     # Prepare task settings
+
+    args.output_dir = f'{args.output_dir_original}_{args.learning_rate}_{args.train_batch_size}'
+    
     if os.path.exists(args.output_dir) and os.listdir(args.output_dir):
         raise ValueError("Output directory ({}) already exists and is not empty.".format(args.output_dir))
     if not os.path.exists(args.output_dir):
@@ -831,10 +846,6 @@ def main():
     output_mode = output_modes[task_name]
     label_list = processor.get_labels()
     num_labels = len(label_list)
-
-    wandb.init(name=f"{args.wandb_runname}_predict_{args.pred_distill}",
-                project="csc2516_project",
-                entity=args.wandb_username)
 
     tokenizer = BertTokenizer.from_pretrained(args.student_model, do_lower_case=args.do_lower_case)
 
@@ -870,7 +881,7 @@ def main():
 
     student_model = TinyBertForSequenceClassification.from_pretrained(args.student_model, num_labels=num_labels)
     student_model.to(device)
-    wandb.watch(student_model)
+    # wandb.watch(student_model)
 
     if args.do_eval:
         logger.info("***** Running evaluation *****")
@@ -923,6 +934,7 @@ def main():
         # Train and evaluate
         global_step = 0
         best_dev_acc = 0.0
+        best_loss = 1e8
         output_eval_file = os.path.join(args.output_dir, "eval_results.txt")
 
         for epoch_ in trange(int(args.num_train_epochs), desc="Epoch"):
@@ -956,10 +968,24 @@ def main():
                     student_layer_num = len(student_atts)
                     assert teacher_layer_num % student_layer_num == 0
                     layers_per_block = int(teacher_layer_num / student_layer_num)
-                    new_teacher_atts = [teacher_atts[i * layers_per_block + layers_per_block - 1]
-                                        for i in range(student_layer_num)]
-                    # new_teacher_atts = [teacher_atts[random.randint(i * layers_per_block, i * layers_per_block + layers_per_block - 1)] 
-                    #                     for i in range(student_layer_num)]
+                    
+                    # Original
+                    if 'OriginalMap' in args.wandb_runname:
+                        new_teacher_atts = [teacher_atts[i * layers_per_block + layers_per_block - 1]
+                                            for i in range(student_layer_num)]
+                    
+                    # Random_Map
+                    elif 'RandomMap' in args.wandb_runname:
+                        new_teacher_atts = [teacher_atts[random.randint(i * layers_per_block, i * layers_per_block + layers_per_block - 1)] 
+                                            for i in range(student_layer_num)]
+
+                    # MeanMap
+                    elif 'MeanMap' in args.wandb_runname:
+                        new_teacher_atts = [sum(teacher_atts[i * layers_per_block:(i+1)*layers_per_block])/layers_per_block 
+                                            for i in range(student_layer_num)]
+                    
+                    else:
+                        raise ValueError("MappingMethod not found: %s" % args.wandb_runname)
 
                     for student_att, teacher_att in zip(student_atts, new_teacher_atts):
                         student_att = torch.where(student_att <= -1e2, torch.zeros_like(student_att).to(device),
@@ -1032,7 +1058,12 @@ def main():
                     result_to_file(result, output_eval_file)
 
                     if not args.pred_distill:
-                        save_model = True
+                        save_model = True # False
+
+                        # if result['loss'] < best_loss:
+                        #     best_loss = result['loss']
+                        #     save_model = True
+
                     else:
                         save_model = False
 
@@ -1102,10 +1133,32 @@ def main():
 
                     student_model.train()
 
-            wandb.log(result)
+            if args.use_wandb:
+                wandb.log(result)
 
-    wandb.finish()
+    # wandb.finish()
 
 
 if __name__ == "__main__":
-    main()
+
+    args = parse_arguments()
+    if args.use_wandb:
+        if args.pred_distill:
+            metric = {'goal': 'maximize', 'name': 'result[\'acc\']'}
+        else:
+            metric = {'goal': 'minimize', 'name': 'loss'}
+        sweep_configuration = {
+            'method': 'grid',
+            'name': args.wandb_runname,
+            'metric': metric,
+            'parameters': 
+            {
+                'batch_size': {'values': [32]},
+                'lr': {'values': [3e-5]}
+                # 'lr': {'values': [5e-3, 1e-3, 5e-4, 1e-4, 5e-5, 1e-5, 5e-6, 1e-6]}
+            }
+        }
+        sweep_id = wandb.sweep(sweep=sweep_configuration, project="csc2516_project")
+        wandb.agent(sweep_id, function=main)
+    else:
+        main()
