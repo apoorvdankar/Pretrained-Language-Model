@@ -790,7 +790,7 @@ def main():
 
     # intermediate distillation default parameters
     default_params = {
-        "cola": {"num_train_epochs": 50, "max_seq_length": 64},
+        "cola": {"num_train_epochs": 30, "max_seq_length": 64},
         "mnli": {"num_train_epochs": 5, "max_seq_length": 128},
         "mrpc": {"num_train_epochs": 20, "max_seq_length": 128},
         "sst-2": {"num_train_epochs": 10, "max_seq_length": 64},
@@ -837,7 +837,7 @@ def main():
 
     if not args.pred_distill and not args.do_eval:
         if task_name in default_params:
-            args.num_train_epochs = default_params[task_name]["num_train_epochs"]
+            args.num_train_epoch = default_params[task_name]["num_train_epochs"]
 
     if task_name not in processors:
         raise ValueError("Task not found: %s" % task_name)
@@ -1078,6 +1078,9 @@ def main():
                         if task_name in mcc_tasks and result['mcc'] > best_dev_acc:
                             best_dev_acc = result['mcc']
                             save_model = True
+                    
+                    if args.use_wandb:
+                        wandb.log(result)
 
                     if save_model:
                         logger.info("***** Save model *****")
@@ -1133,8 +1136,7 @@ def main():
 
                     student_model.train()
 
-            if args.use_wandb:
-                wandb.log(result)
+            
 
     # wandb.finish()
 
@@ -1154,11 +1156,11 @@ if __name__ == "__main__":
             'parameters': 
             {
                 'batch_size': {'values': [32]},
-                'lr': {'values': [3e-5]}
+                'lr': {'values': [5e-5]}
                 # 'lr': {'values': [5e-3, 1e-3, 5e-4, 1e-4, 5e-5, 1e-5, 5e-6, 1e-6]}
             }
         }
-        sweep_id = wandb.sweep(sweep=sweep_configuration, project="csc2516_project")
+        sweep_id = wandb.sweep(sweep=sweep_configuration, project=f"csc2516_project-{args.task_name}")
         wandb.agent(sweep_id, function=main)
     else:
         main()
