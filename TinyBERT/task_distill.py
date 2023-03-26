@@ -934,7 +934,6 @@ def main():
         # Train and evaluate
         global_step = 0
         best_dev_acc = 0.0
-        best_loss = 1e8
         output_eval_file = os.path.join(args.output_dir, "eval_results.txt")
 
         for epoch_ in trange(int(args.num_train_epochs), desc="Epoch"):
@@ -969,24 +968,27 @@ def main():
                     assert teacher_layer_num % student_layer_num == 0
                     layers_per_block = int(teacher_layer_num / student_layer_num)
                     
-                    # Original
-                    if 'OriginalMap' in args.wandb_runname:
-                        new_teacher_atts = [teacher_atts[i * layers_per_block + layers_per_block - 1]
-                                            for i in range(student_layer_num)]
-                    
                     # Random_Map
-                    elif 'RandomMap' in args.wandb_runname:
+                    if 'RandomMap' in args.wandb_runname:
                         new_teacher_atts = [teacher_atts[random.randint(i * layers_per_block, i * layers_per_block + layers_per_block - 1)] 
+                                            for i in range(student_layer_num)]
+                        new_teacher_reps = [teacher_reps[0]]+[teacher_reps[random.randint(i * layers_per_block + 1, i * layers_per_block + layers_per_block)] 
                                             for i in range(student_layer_num)]
 
                     # MeanMap
                     elif 'MeanMap' in args.wandb_runname:
                         new_teacher_atts = [sum(teacher_atts[i * layers_per_block:(i+1)*layers_per_block])/layers_per_block 
                                             for i in range(student_layer_num)]
+                        new_teacher_reps = [teacher_reps[0]] + [sum(teacher_reps[i * layers_per_block + 1:(i+1)*layers_per_block + 1])/layers_per_block 
+                                            for i in range(student_layer_num)]
                     
+                    # OriginalMap
                     else:
-                        raise ValueError("MappingMethod not found: %s" % args.wandb_runname)
-
+                        new_teacher_atts = [teacher_atts[i * layers_per_block + layers_per_block - 1]
+                                            for i in range(student_layer_num)]
+                        new_teacher_reps = [teacher_reps[i * layers_per_block] 
+                                            for i in range(student_layer_num + 1)]
+                    
                     for student_att, teacher_att in zip(student_atts, new_teacher_atts):
                         student_att = torch.where(student_att <= -1e2, torch.zeros_like(student_att).to(device),
                                                   student_att)
@@ -996,7 +998,6 @@ def main():
                         tmp_loss = loss_mse(student_att, teacher_att)
                         att_loss += tmp_loss
 
-                    new_teacher_reps = [teacher_reps[i * layers_per_block] for i in range(student_layer_num + 1)]
                     new_student_reps = student_reps
                     for student_rep, teacher_rep in zip(new_student_reps, new_teacher_reps):
                         tmp_loss = loss_mse(student_rep, teacher_rep)
@@ -1057,12 +1058,11 @@ def main():
 
                     result_to_file(result, output_eval_file)
 
-                    if not args.pred_distill:
-                        save_model = True # False
+                    if args.use_wandb:
+                        wandb.log(result)
 
-                        # if result['loss'] < best_loss:
-                        #     best_loss = result['loss']
-                        #     save_model = True
+                    if not args.pred_distill:
+                        save_model = True 
 
                     else:
                         save_model = False
@@ -1078,9 +1078,6 @@ def main():
                         if task_name in mcc_tasks and result['mcc'] > best_dev_acc:
                             best_dev_acc = result['mcc']
                             save_model = True
-                    
-                    if args.use_wandb:
-                        wandb.log(result)
 
                     if save_model:
                         logger.info("***** Save model *****")
