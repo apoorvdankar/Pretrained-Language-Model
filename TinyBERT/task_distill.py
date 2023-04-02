@@ -748,7 +748,10 @@ def parse_arguments():
                         default='username')
     parser.add_argument('--wandb_runname',
                         type=str,
-                        default='runname')                                                
+                        default='runname')
+    parser.add_argument('--rep_loss_weight',
+                        type=float,
+                        default = 0.5)                                                
 
     args = parser.parse_args()
     logger.info('The args: {}'.format(args))
@@ -761,7 +764,8 @@ def main():
         
         args.learning_rate = wandb.config.lr
         args.train_batch_size = wandb.config.batch_size
-        run.name = f"{args.wandb_runname}_{args.learning_rate}_{args.train_batch_size}_predict_{args.pred_distill}"
+        args.rep_loss_weight = wandb.config.rep_loss_weight
+        run.name = f"{args.wandb_runname}_rep_weight_{args.rep_loss_weight}_lr_{args.learning_rate}_bs_{args.train_batch_size}_predict_{args.pred_distill}"
 
     processors = {
         "cola": ColaProcessor,
@@ -790,7 +794,7 @@ def main():
 
     # intermediate distillation default parameters
     default_params = {
-        "cola": {"num_train_epochs": 50, "max_seq_length": 64},
+        "cola": {"num_train_epochs": 30, "max_seq_length": 64},
         "mnli": {"num_train_epochs": 5, "max_seq_length": 128},
         "mrpc": {"num_train_epochs": 20, "max_seq_length": 128},
         "sst-2": {"num_train_epochs": 10, "max_seq_length": 64},
@@ -823,8 +827,12 @@ def main():
 
     # Prepare task settings
 
-    args.output_dir = f'{args.output_dir_original}_{args.learning_rate}_{args.train_batch_size}'
-    
+    # change this back for stage 2
+    if args.pred_distill or args.do_eval:
+        args.output_dir = f'{args.output_dir_original}_rep_weight_{args.rep_loss_weight}/lr_${args.learning_rate}_bs_{args.train_batch_size}'
+    else:
+        args.output_dir = f'{args.output_dir_original}_rep_weight_{args.rep_loss_weight}/'
+
     if os.path.exists(args.output_dir) and os.listdir(args.output_dir):
         raise ValueError("Output directory ({}) already exists and is not empty.".format(args.output_dir))
     if not os.path.exists(args.output_dir):
@@ -936,7 +944,7 @@ def main():
         best_dev_acc = 0.0
         best_loss = 1e8
         output_eval_file = os.path.join(args.output_dir, "eval_results.txt")
-
+        result ={}
         for epoch_ in trange(int(args.num_train_epochs), desc="Epoch"):
             tr_loss = 0.
             tr_att_loss = 0.
@@ -968,14 +976,9 @@ def main():
                     student_layer_num = len(student_atts)
                     assert teacher_layer_num % student_layer_num == 0
                     layers_per_block = int(teacher_layer_num / student_layer_num)
-                    
-                    # Original
-                    if 'OriginalMap' in args.wandb_runname:
-                        new_teacher_atts = [teacher_atts[i * layers_per_block + layers_per_block - 1]
-                                            for i in range(student_layer_num)]
-                    
+                        
                     # Random_Map
-                    elif 'RandomMap' in args.wandb_runname:
+                    if 'RandomMap' in args.wandb_runname:
                         new_teacher_atts = [teacher_atts[random.randint(i * layers_per_block, i * layers_per_block + layers_per_block - 1)] 
                                             for i in range(student_layer_num)]
 
@@ -983,9 +986,11 @@ def main():
                     elif 'MeanMap' in args.wandb_runname:
                         new_teacher_atts = [sum(teacher_atts[i * layers_per_block:(i+1)*layers_per_block])/layers_per_block 
                                             for i in range(student_layer_num)]
-                    
+                        
+                    # if no mapping specified in wandb_runname then do the original mapping
                     else:
-                        raise ValueError("MappingMethod not found: %s" % args.wandb_runname)
+                        new_teacher_atts = [teacher_atts[i * layers_per_block + layers_per_block - 1]
+                                            for i in range(student_layer_num)]
 
                     for student_att, teacher_att in zip(student_atts, new_teacher_atts):
                         student_att = torch.where(student_att <= -1e2, torch.zeros_like(student_att).to(device),
@@ -1001,8 +1006,12 @@ def main():
                     for student_rep, teacher_rep in zip(new_student_reps, new_teacher_reps):
                         tmp_loss = loss_mse(student_rep, teacher_rep)
                         rep_loss += tmp_loss
-
-                    loss = rep_loss + att_loss
+                    
+                    if args.pred_distill or args.do_eval:
+                        scaled_rep_weight = 0.5
+                    else:
+                        scaled_rep_weight = 2 * args.rep_loss_weight
+                    loss = (scaled_rep_weight) * rep_loss + (2 - scaled_rep_weight) * att_loss
                     tr_att_loss += att_loss.item()
                     tr_rep_loss += rep_loss.item()
                 else:
@@ -1057,6 +1066,8 @@ def main():
 
                     result_to_file(result, output_eval_file)
 
+                    if args.use_wandb:
+                        wandb.log(result)
                     if not args.pred_distill:
                         save_model = True # False
 
@@ -1133,14 +1144,14 @@ def main():
 
                     student_model.train()
 
-            if args.use_wandb:
-                wandb.log(result)
-
-    # wandb.finish()
+    if args.use_wandb:
+        run.summary['best_dev_acc'] = best_dev_acc
+        wandb.finish()
 
 
 if __name__ == "__main__":
 
+    # for stage 1 all training has to be done for learning rate: 5e-5 and batch size 32
     args = parse_arguments()
     if args.use_wandb:
         if args.pred_distill:
@@ -1154,8 +1165,9 @@ if __name__ == "__main__":
             'parameters': 
             {
                 'batch_size': {'values': [32]},
-                'lr': {'values': [3e-5]}
+                'lr': {'values': [5e-5]},
                 # 'lr': {'values': [5e-3, 1e-3, 5e-4, 1e-4, 5e-5, 1e-5, 5e-6, 1e-6]}
+                'rep_loss_weight': {'values': [args.rep_loss_weight]}
             }
         }
         sweep_id = wandb.sweep(sweep=sweep_configuration, project="csc2516_project")
