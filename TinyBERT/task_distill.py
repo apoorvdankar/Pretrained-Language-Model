@@ -845,7 +845,7 @@ def main():
 
     if not args.pred_distill and not args.do_eval:
         if task_name in default_params:
-            args.num_train_epochs = default_params[task_name]["num_train_epochs"]
+            args.num_train_epoch = default_params[task_name]["num_train_epochs"]
 
     if task_name not in processors:
         raise ValueError("Task not found: %s" % task_name)
@@ -976,21 +976,27 @@ def main():
                     student_layer_num = len(student_atts)
                     assert teacher_layer_num % student_layer_num == 0
                     layers_per_block = int(teacher_layer_num / student_layer_num)
-                        
+
                     # Random_Map
                     if 'RandomMap' in args.wandb_runname:
                         new_teacher_atts = [teacher_atts[random.randint(i * layers_per_block, i * layers_per_block + layers_per_block - 1)] 
+                                            for i in range(student_layer_num)]
+                        new_teacher_reps = [teacher_reps[0]]+[teacher_reps[random.randint(i * layers_per_block + 1, i * layers_per_block + layers_per_block)] 
                                             for i in range(student_layer_num)]
 
                     # MeanMap
                     elif 'MeanMap' in args.wandb_runname:
                         new_teacher_atts = [sum(teacher_atts[i * layers_per_block:(i+1)*layers_per_block])/layers_per_block 
                                             for i in range(student_layer_num)]
+                        new_teacher_reps = [teacher_reps[0]] + [sum(teacher_reps[i * layers_per_block + 1:(i+1)*layers_per_block + 1])/layers_per_block 
+                                            for i in range(student_layer_num)]
                         
-                    # if no mapping specified in wandb_runname then do the original mapping
+                    # OriginalMap
                     else:
                         new_teacher_atts = [teacher_atts[i * layers_per_block + layers_per_block - 1]
                                             for i in range(student_layer_num)]
+                        new_teacher_reps = [teacher_reps[i * layers_per_block] 
+                                            for i in range(student_layer_num + 1)]
 
                     for student_att, teacher_att in zip(student_atts, new_teacher_atts):
                         student_att = torch.where(student_att <= -1e2, torch.zeros_like(student_att).to(device),
@@ -1001,7 +1007,6 @@ def main():
                         tmp_loss = loss_mse(student_att, teacher_att)
                         att_loss += tmp_loss
 
-                    new_teacher_reps = [teacher_reps[i * layers_per_block] for i in range(student_layer_num + 1)]
                     new_student_reps = student_reps
                     for student_rep, teacher_rep in zip(new_student_reps, new_teacher_reps):
                         tmp_loss = loss_mse(student_rep, teacher_rep)
@@ -1068,12 +1073,9 @@ def main():
 
                     if args.use_wandb:
                         wandb.log(result)
-                    if not args.pred_distill:
-                        save_model = True # False
 
-                        # if result['loss'] < best_loss:
-                        #     best_loss = result['loss']
-                        #     save_model = True
+                    if not args.pred_distill:
+                        save_model = True 
 
                     else:
                         save_model = False
@@ -1151,7 +1153,6 @@ def main():
 
 if __name__ == "__main__":
 
-    # for stage 1 all training has to be done for learning rate: 5e-5 and batch size 32
     args = parse_arguments()
     if args.use_wandb:
         if args.pred_distill:
