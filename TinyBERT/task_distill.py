@@ -28,6 +28,7 @@ import random
 import sys
 import wandb
 
+import pandas as pd
 import numpy as np
 import torch
 from torch.utils.data import (DataLoader, RandomSampler, SequentialSampler,
@@ -748,7 +749,11 @@ def parse_arguments():
                         default='username')
     parser.add_argument('--wandb_runname',
                         type=str,
-                        default='runname')                                                
+                        default='runname')    
+    parser.add_argument("--learnable_lr",
+                        default=5e-5,
+                        type=float,
+                        help="The initial learnableMap lr.")                                            
 
     args = parser.parse_args()
     logger.info('The args: {}'.format(args))
@@ -761,7 +766,17 @@ def main():
         
         args.learning_rate = wandb.config.lr
         args.train_batch_size = wandb.config.batch_size
-        run.name = f"{args.wandb_runname}_{args.learning_rate}_{args.train_batch_size}_predict_{args.pred_distill}"
+
+        if args.pred_distill and 'LearnableMap' in args.wandb_runname:
+            args.learnable_lr = 0
+            ind = args.student_model.index(args.wandb_runname)
+            tmp_model = args.student_model[ind+len(args.wandb_runname)+1:]
+            run.name = f"{args.wandb_runname}_{tmp_model}_{args.learning_rate}_{args.train_batch_size}_predict_{args.pred_distill}"
+        elif 'LearnableMap' in args.wandb_runname:
+            args.learnable_lr = wandb.config.learnable_lr
+            run.name = f"{args.wandb_runname}_{args.learning_rate}_{args.learnable_lr}_{args.train_batch_size}_predict_{args.pred_distill}"
+        else:
+            run.name = f"{args.wandb_runname}_{args.learning_rate}_{args.train_batch_size}_predict_{args.pred_distill}"
 
     processors = {
         "cola": ColaProcessor,
@@ -823,7 +838,14 @@ def main():
 
     # Prepare task settings
 
-    args.output_dir = f'{args.output_dir_original}_{args.learning_rate}_{args.train_batch_size}'
+    if args.pred_distill and 'LearnableMap' in args.wandb_runname:
+        ind = args.student_model.index(args.wandb_runname)
+        tmp_model = args.student_model[ind+len(args.wandb_runname)+1:]
+        args.output_dir = f'{args.output_dir_original}_{tmp_model}_{args.learning_rate}_{args.train_batch_size}'
+    elif 'LearnableMap' in args.wandb_runname:
+        args.output_dir = f'{args.output_dir_original}_{args.learning_rate}_{args.learnable_lr}_{args.train_batch_size}'
+    else:
+        args.output_dir = f'{args.output_dir_original}_{args.learning_rate}_{args.train_batch_size}'
     
     if os.path.exists(args.output_dir) and os.listdir(args.output_dir):
         raise ValueError("Output directory ({}) already exists and is not empty.".format(args.output_dir))
@@ -902,8 +924,26 @@ def main():
         if n_gpu > 1:
             student_model = torch.nn.DataParallel(student_model)
             teacher_model = torch.nn.DataParallel(teacher_model)
+
+        teacher_layer_num = teacher_model.config.num_hidden_layers
+        student_layer_num = student_model.config.num_hidden_layers
+        assert teacher_layer_num % student_layer_num == 0
+        layers_per_block = int(teacher_layer_num / student_layer_num)
+
+        if 'LearnableMapUniformStart' in args.wandb_runname:
+            learnable_tensor = torch.full((student_layer_num, layers_per_block), 1/layers_per_block)
+            learnable_map = torch.nn.Parameter(learnable_tensor, requires_grad=True)
+        elif 'LearnableMap001Start' in args.wandb_runname:
+            learnable_tensor = torch.full((student_layer_num, layers_per_block), -1.0)
+            learnable_tensor[:, -1] = 1.0
+            learnable_map = torch.nn.Parameter(learnable_tensor, requires_grad=True)
+        else:
+            learnable_map = torch.nn.Parameter(torch.randn(student_layer_num, layers_per_block, device=device))
+
         # Prepare optimizer
         param_optimizer = list(student_model.named_parameters())
+        param_optimizer.append(('learnable_map', learnable_map))
+
         size = 0
         for n, p in student_model.named_parameters():
             logger.info('n: {}'.format(n))
@@ -912,9 +952,11 @@ def main():
         logger.info('Total parameters: {}'.format(size))
         no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
         optimizer_grouped_parameters = [
-            {'params': [p for n, p in param_optimizer if not any(nd in n for nd in no_decay)], 'weight_decay': 0.01},
-            {'params': [p for n, p in param_optimizer if any(nd in n for nd in no_decay)], 'weight_decay': 0.0}
+            {'params': [p for n, p in param_optimizer if ( not any(nd in n for nd in no_decay) and n != 'learnable_map')], 'weight_decay': 0.01},
+            {'params': [p for n, p in param_optimizer if any(nd in n for nd in no_decay)], 'weight_decay': 0.0},
+            {'params': [learnable_map], 'weight_decay': 0.0, 'lr': args.learnable_lr}
         ]
+
         schedule = 'warmup_linear'
         if not args.pred_distill:
             schedule = 'none'
@@ -935,6 +977,8 @@ def main():
         global_step = 0
         best_dev_acc = 0.0
         output_eval_file = os.path.join(args.output_dir, "eval_results.txt")
+
+        normalized_weights_list = []
 
         for epoch_ in trange(int(args.num_train_epochs), desc="Epoch"):
             tr_loss = 0.
@@ -963,10 +1007,6 @@ def main():
                     teacher_logits, teacher_atts, teacher_reps = teacher_model(input_ids, segment_ids, input_mask)
 
                 if not args.pred_distill:
-                    teacher_layer_num = len(teacher_atts)
-                    student_layer_num = len(student_atts)
-                    assert teacher_layer_num % student_layer_num == 0
-                    layers_per_block = int(teacher_layer_num / student_layer_num)
                     
                     # Random_Map
                     if 'RandomMap' in args.wandb_runname:
@@ -982,6 +1022,31 @@ def main():
                         new_teacher_reps = [teacher_reps[0]] + [sum(teacher_reps[i * layers_per_block + 1:(i+1)*layers_per_block + 1])/layers_per_block 
                                             for i in range(student_layer_num)]
                     
+                    # MeanLoss
+                    elif 'MeanLoss' in args.wandb_runname:
+                        new_teacher_atts = [i/(layers_per_block**0.5) for i in teacher_atts]
+                        new_teacher_reps = [i/(layers_per_block**0.5) for i in teacher_reps]
+                        student_atts = [i/(layers_per_block**0.5) for i in student_atts for j in range(layers_per_block)]
+                        student_reps = [i/(layers_per_block**0.5) for i in student_reps for j in range(layers_per_block)]
+                    
+                    #LearnableMap
+                    elif 'LearnableMap' in args.wandb_runname:
+                        normalized_weights = torch.nn.functional.softmax(learnable_map, dim=-1)
+                        
+                        # Modified calculation of new_teacher_atts
+                        new_teacher_atts = []
+                        for i in range(student_layer_num):
+                            block_start = i * layers_per_block
+                            weighted_att = sum([normalized_weights[i, j] * teacher_atts[block_start + j] for j in range(layers_per_block)])
+                            new_teacher_atts.append(weighted_att)
+
+                        # Modified calculation of new_teacher_reps
+                        new_teacher_reps = [teacher_reps[0]]
+                        for i in range(0, student_layer_num):
+                            block_start = i * layers_per_block + 1
+                            weighted_rep = sum([normalized_weights[i, j] * teacher_reps[block_start + j] for j in range(layers_per_block)])
+                            new_teacher_reps.append(weighted_rep)
+
                     # OriginalMap
                     else:
                         new_teacher_atts = [teacher_atts[i * layers_per_block + layers_per_block - 1]
@@ -998,8 +1063,7 @@ def main():
                         tmp_loss = loss_mse(student_att, teacher_att)
                         att_loss += tmp_loss
 
-                    new_student_reps = student_reps
-                    for student_rep, teacher_rep in zip(new_student_reps, new_teacher_reps):
+                    for student_rep, teacher_rep in zip(student_reps, new_teacher_reps):
                         tmp_loss = loss_mse(student_rep, teacher_rep)
                         rep_loss += tmp_loss
 
@@ -1045,6 +1109,11 @@ def main():
                     cls_loss = tr_cls_loss / (step + 1)
                     att_loss = tr_att_loss / (step + 1)
                     rep_loss = tr_rep_loss / (step + 1)
+
+                    # Saving weights of learnable parameters
+                    if not args.pred_distill and 'LearnableMap' in args.wandb_runname:
+                        normalized_weights_flat = normalized_weights.view(-1).detach().cpu().numpy()
+                        normalized_weights_list.append(normalized_weights_flat)
 
                     result = {}
                     if args.pred_distill:
@@ -1133,9 +1202,13 @@ def main():
 
                     student_model.train()
 
-            
-
-    # wandb.finish()
+        if args.use_wandb:
+            run.summary['best_dev_acc'] = best_dev_acc
+            wandb.finish()
+        
+        if not args.pred_distill and 'LearnableMap' in args.wandb_runname:
+            normalized_weights_df = pd.DataFrame(normalized_weights_list)
+            normalized_weights_df.to_csv(f'{args.output_dir}/normalized_weights.csv', index=False)
 
 
 if __name__ == "__main__":
@@ -1143,19 +1216,24 @@ if __name__ == "__main__":
     args = parse_arguments()
     if args.use_wandb:
         if args.pred_distill:
-            metric = {'goal': 'maximize', 'name': 'result[\'acc\']'}
+            metric = {'goal': 'maximize', 'name': 'best_dev_acc'}
+            parameters = {
+                'batch_size': {'values': [16, 32]},
+                'lr': {'values': [1e-5, 2e-5, 3e-5]}
+            }
         else:
             metric = {'goal': 'minimize', 'name': 'loss'}
+            parameters = {
+                'batch_size': {'values': [32]},
+                'lr': {'values': [5e-5]},
+                'learnable_lr': {'values': [1e-3, 1e-4, 5e-5]}
+            }
         sweep_configuration = {
             'method': 'grid',
             'name': args.wandb_runname,
             'metric': metric,
-            'parameters': 
-            {
-                'batch_size': {'values': [32]},
-                'lr': {'values': [5e-5]}
-                # 'lr': {'values': [5e-3, 1e-3, 5e-4, 1e-4, 5e-5, 1e-5, 5e-6, 1e-6]}
-            }
+            'parameters': parameters
+            
         }
         sweep_id = wandb.sweep(sweep=sweep_configuration, project=f"csc2516_project-{args.task_name}")
         wandb.agent(sweep_id, function=main)
