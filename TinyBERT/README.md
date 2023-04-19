@@ -2,8 +2,8 @@ KL Divergence Configuration
 ===========================
 To use KL divergence instead of the base attention loss (MSE), modify the sweep configuration in the `main` function. Set the `kl_attn_weight` parameter to the desired weight for the KL loss. If you want to use the base attention loss (MSE), set the `kl_attn_weight` to `None`. The relevant section of the code is as follows:
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     args = parse_arguments()
     if args.use_wandb:
         if args.pred_distill:
