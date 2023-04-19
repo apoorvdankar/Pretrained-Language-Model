@@ -1,3 +1,72 @@
+Mapping Functions
+=================
+Different mapping functions can be applied to align the student and teacher layers. The choice of mapping function is determined by the `run_name` passed as an argument. The following mapping functions are available:
+
+1. Random_Map
+2. MeanMap
+3. MeanLoss
+4. LearnableMap
+5. OriginalMap (default)
+
+The mapping functions are applied in the code as follows:
+
+if 'RandomMap' in args.wandb_runname:
+    ...
+
+elif 'MeanMap' in args.wandb_runname:
+    ...
+
+elif 'MeanLoss' in args.wandb_runname:
+    ...
+
+elif 'LearnableMap' in args.wandb_runname:
+    ...
+
+else:  # OriginalMap
+    ...
+
+To use a specific mapping function, include the corresponding function name (e.g., 'RandomMap', 'MeanMap', etc.) in the `run_name` argument when running the script.
+
+
+
+Example commands to run the code:
+================================
+srun -p smallgpunodes --gres gpu \
+      python3 $TASK_DISTILL_PY \
+            --teacher_model $FT_BERT_BASE_DIR \
+            --student_model $GENERAL_TINYBERT_DIR \
+            --data_dir $TASK_DIR \
+            --task_name $TASK_NAME \
+            --output_dir $TMP_TINYBERT_DIR \
+            --max_seq_length 128 \
+            --train_batch_size 32 \
+            --learning_rate 5e-5 \
+            --learnable_lr 0.001 \
+            --num_train_epochs 1 \
+            --do_lower_case \
+			--use_wandb \
+            --wandb_username $WANDB_USERNAME \
+            --wandb_runname $RUN_NAME
+            
+
+srun -p smallgpunodes --gres gpu \
+      python3 $TASK_DISTILL_PY --pred_distill  \
+            --teacher_model $FT_BERT_BASE_DIR \
+            --student_model $TMP_TINYBERT_DIR_SUFFIX \
+            --data_dir $TASK_DIR \
+            --task_name $TASK_NAME \
+            --output_dir $TINYBERT_DIR \
+            --do_lower_case \
+            --num_train_epochs 3 \
+            --max_seq_length 128 \
+            --learning_rate 3e-5 \
+            --train_batch_size 32 \
+			--use_wandb \
+            --wandb_username $WANDB_USERNAME \
+            --wandb_runname $RUN_NAME
+
+
+
 TinyBERT
 ======== 
 TinyBERT is 7.5x smaller and 9.4x faster on inference than BERT-base and achieves competitive performances in the tasks of natural language understanding. It performs a novel transformer distillation at both the pre-training and task-specific learning stages. The overview of TinyBERT learning is illustrated as follows: 
