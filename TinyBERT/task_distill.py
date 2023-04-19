@@ -1074,13 +1074,6 @@ def main():
                     if not args.pred_distill:
                         save_model = True 
 
-                    else:
-                        save_model = False
-
-                        if task_name in acc_tasks and result['acc'] > best_dev_acc:
-                            best_dev_acc = result['acc']
-                            save_model = True
-
                         if task_name in corr_tasks and result['corr'] > best_dev_acc:
                             best_dev_acc = result['corr']
                             save_model = True
