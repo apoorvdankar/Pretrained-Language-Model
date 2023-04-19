@@ -1,0 +1,90 @@
+{
+    "os": "Linux-5.15.0-46-generic-x86_64-with-glibc2.35",
+    "python": "3.10.6",
+    "heartbeatAt": "2023-03-27T18:10:06.484993",
+    "startedAt": "2023-03-27T18:10:05.793753",
+    "docker": null,
+    "cuda": null,
+    "args": [
+        "--teacher_model",
+        "/w/331/adeemj/csc2516_proj/models/CoLA/models--textattack--bert-base-uncased-CoLA/snapshots/5fed03dd6bc5f0b40e86cb04cd1a16eb404ba391/",
+        "--student_model",
+        "/w/331/adeemj/csc2516_proj/models/models--huawei-noah--TinyBERT_General_4L_312D/snapshots/34707a33cd59a94ecde241ac209bf35103691b43/",
+        "--data_dir",
+        "/w/331/adeemj/csc2516_proj/data/CoLA",
+        "--task_name",
+        "CoLA",
+        "--output_dir",
+        "/w/331/adeemj/csc2516_proj/models/CoLA/BASE_COMPARE/TempTinyBERT_CoLA_4L_312D",
+        "--max_seq_length",
+        "128",
+        "--train_batch_size",
+        "32",
+        "--learning_rate",
+        "5e-5",
+        "--num_train_epochs",
+        "30",
+        "--do_lower_case",
+        "--use_wandb",
+        "--wandb_username",
+        "99adeem",
+        "--wandb_runname",
+        "BASE_COMPARE"
+    ],
+    "state": "running",
+    "program": "/w/331/adeemj/csc2516_proj/Pretrained-Language-Model/TinyBERT/task_distill.py",
+    "codePath": "TinyBERT/task_distill.py",
+    "git": {
+        "remote": "https://github.com/apoorvdankar/Pretrained-Language-Model.git",
+        "commit": "448958346c0f4922726665a6e1245732903d27dd"
+    },
+    "email": null,
+    "root": "/w/331/adeemj/csc2516_proj/Pretrained-Language-Model",
+    "host": "gpunode6",
+    "username": "adeemj",
+    "executable": "/w/331/adeemj/csc2516_proj/myenv/bin/python3",
+    "cpu_count": 4,
+    "cpu_count_logical": 4,
+    "cpu_freq": {
+        "current": 3309.737,
+        "min": 800.0,
+        "max": 3600.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2438.948,
+            "min": 800.0,
+            "max": 3600.0
+        },
+        {
+            "current": 3600.0,
+            "min": 800.0,
+            "max": 3600.0
+        },
+        {
+            "current": 3600.0,
+            "min": 800.0,
+            "max": 3600.0
+        },
+        {
+            "current": 3600.0,
+            "min": 800.0,
+            "max": 3600.0
+        }
+    ],
+    "disk": {
+        "total": 455.6473159790039,
+        "used": 42.20069885253906
+    },
+    "gpu": "NVIDIA RTX A4000",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "NVIDIA RTX A4000",
+            "memory_total": 17171480576
+        }
+    ],
+    "memory": {
+        "total": 31.19997787475586
+    }
+}

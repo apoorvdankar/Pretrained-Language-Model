@@ -43,6 +43,9 @@ from transformer.tokenization import BertTokenizer
 from transformer.optimization import BertAdam
 from transformer.file_utils import WEIGHTS_NAME, CONFIG_NAME
 
+# additional imports
+import re
+
 csv.field_size_limit(sys.maxsize)
 
 log_format = '%(asctime)s %(message)s'
@@ -746,9 +749,21 @@ def parse_arguments():
     parser.add_argument('--wandb_username',
                         type=str,
                         default='username')
-    parser.add_argument('--wandb_runname',
+    parser.add_argument('--runname',
                         type=str,
-                        default='runname')                                                
+                        default='runname')
+    parser.add_argument('--no_save',
+                        action='store_true')
+    # expt args
+    parser.add_argument('--kl_attn_weight',
+                        type=float,
+                        default=None)
+
+    parser.add_argument("--train_data_percent",
+                        default=100,
+                        type=float,
+                        help="Percentage of training data to use for training. Value should be between 0 and 100.")
+
 
     args = parser.parse_args()
     logger.info('The args: {}'.format(args))
@@ -757,11 +772,38 @@ def parse_arguments():
 def main():
 
     if args.use_wandb:
+        # Initialize WandB run
         run = wandb.init()
-        
+
+        # Set learning rate and batch size from WandB configuration
         args.learning_rate = wandb.config.lr
         args.train_batch_size = wandb.config.batch_size
-        run.name = f"{args.wandb_runname}_{args.learning_rate}_{args.train_batch_size}_predict_{args.pred_distill}"
+
+    # Extract kl weight from student_model name using regex if pred_distill is True, or get it from the WandB configuration otherwise
+    if args.pred_distill:
+        kl_attn_weight_match = re.findall(r"klweight(\d+(?:\.\d+)?)", args.student_model)
+        kl_attn_weight = kl_attn_weight_match[0] if kl_attn_weight_match else None
+    else:
+        if args.use_wandb:
+            kl_attn_weight = wandb.config.get('kl_attn_weight', None)
+        else:
+            kl_attn_weight = args.kl_attn_weight
+        
+
+    run_name = args.runname
+    # Set run name based on whether kl weight is available or not
+    if kl_attn_weight is not None:
+        run_name += f"_klweight{kl_attn_weight}"
+
+    # Append lr, batch size and pred_distill to the run name if pred_distill is True
+    if args.pred_distill:
+        run_name += f"_lr{args.learning_rate}_bs{args.train_batch_size}"
+    run_name += f"_epochs{args.num_train_epochs}"
+    run_name += f"_predict_{args.pred_distill}"
+
+    # Set run name in WandB if using WandB
+    if args.use_wandb:
+        run.name = run_name
 
     processors = {
         "cola": ColaProcessor,
@@ -821,11 +863,13 @@ def main():
     if n_gpu > 0:
         torch.cuda.manual_seed_all(args.seed)
 
-    # Prepare task settings
+    # Prepare task settings 
+    # need to update later
+    args.output_dir = os.path.join(f"/w/331/adeemj/csc2516_proj/models/{args.task_name}/buffer", run_name)
+    print("args.output_dir: ", args.output_dir)
 
-    args.output_dir = f'{args.output_dir_original}_{args.learning_rate}_{args.train_batch_size}'
-    
-    if os.path.exists(args.output_dir) and os.listdir(args.output_dir):
+
+    if os.path.exists(args.output_dir) and os.listdir(args.output_dir) and not args.no_save:
         raise ValueError("Output directory ({}) already exists and is not empty.".format(args.output_dir))
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
@@ -854,6 +898,14 @@ def main():
             train_examples = processor.get_train_examples(args.data_dir)
         else:
             train_examples = processor.get_aug_examples(args.data_dir)
+
+        # Apply the percentage of training data to use
+        num_train_examples = int(len(train_examples) * args.train_data_percent / 100)
+        # select num_train_examples from train_examples randomly without replacement
+        train_examples = random.sample(train_examples, num_train_examples)
+        # print number of training examples
+        print("Number of training examples: ", len(train_examples))
+
         if args.gradient_accumulation_steps < 1:
             raise ValueError("Invalid gradient_accumulation_steps parameter: {}, should be >= 1".format(
                 args.gradient_accumulation_steps))
@@ -941,6 +993,16 @@ def main():
             targets_prob = torch.nn.functional.softmax(targets, dim=-1)
             return (- targets_prob * student_likelihood).mean()
 
+        def attention_kl_divergence(student_scores, teacher_scores):
+            # Compute the softmax probabilities along the last dimension of the tensors
+            teacher_probs = torch.nn.functional.softmax(teacher_scores, dim=-1)
+            student_log_probs = torch.nn.functional.log_softmax(student_scores, dim=-1)
+
+            # Compute the KL divergence between the two distributions
+            kl_divergence = torch.nn.functional.kl_div(student_log_probs, teacher_probs, reduction='batchmean')
+    
+            return kl_divergence
+
         # Train and evaluate
         global_step = 0
         best_dev_acc = 0.0
@@ -979,14 +1041,14 @@ def main():
                     layers_per_block = int(teacher_layer_num / student_layer_num)
                     
                     # Random_Map
-                    if 'RandomMap' in args.wandb_runname:
+                    if 'RandomMap' in args.runname:
                         new_teacher_atts = [teacher_atts[random.randint(i * layers_per_block, i * layers_per_block + layers_per_block - 1)] 
                                             for i in range(student_layer_num)]
                         new_teacher_reps = [teacher_reps[0]]+[teacher_reps[random.randint(i * layers_per_block + 1, i * layers_per_block + layers_per_block)] 
                                             for i in range(student_layer_num)]
 
                     # MeanMap
-                    elif 'MeanMap' in args.wandb_runname:
+                    elif 'MeanMap' in args.runname:
                         new_teacher_atts = [sum(teacher_atts[i * layers_per_block:(i+1)*layers_per_block])/layers_per_block 
                                             for i in range(student_layer_num)]
                         new_teacher_reps = [teacher_reps[0]] + [sum(teacher_reps[i * layers_per_block + 1:(i+1)*layers_per_block + 1])/layers_per_block 
@@ -1005,7 +1067,11 @@ def main():
                         teacher_att = torch.where(teacher_att <= -1e2, torch.zeros_like(teacher_att).to(device),
                                                   teacher_att)
 
-                        tmp_loss = loss_mse(student_att, teacher_att)
+                        # print("kl_att_weight: ", kl_attn_weight)
+                        if kl_attn_weight is not None:
+                            tmp_loss = kl_attn_weight*attention_kl_divergence(student_att, teacher_att)
+                        else:
+                            tmp_loss = loss_mse(student_att, teacher_att)
                         att_loss += tmp_loss
 
                     new_student_reps = student_reps
@@ -1074,6 +1140,13 @@ def main():
                     if not args.pred_distill:
                         save_model = True 
 
+                    else:
+                        save_model = False
+
+                        if task_name in acc_tasks and result['acc'] > best_dev_acc:
+                            best_dev_acc = result['acc']
+                            save_model = True
+
                         if task_name in corr_tasks and result['corr'] > best_dev_acc:
                             best_dev_acc = result['corr']
                             save_model = True
@@ -1081,6 +1154,9 @@ def main():
                         if task_name in mcc_tasks and result['mcc'] > best_dev_acc:
                             best_dev_acc = result['mcc']
                             save_model = True
+
+                    # save the model only if args.no_save is not set
+                    save_model = save_model and not args.no_save
 
                     if save_model:
                         logger.info("***** Save model *****")
@@ -1092,7 +1168,6 @@ def main():
                         #     model_name = "step_{}_{}".format(global_step, WEIGHTS_NAME)
                         output_model_file = os.path.join(args.output_dir, model_name)
                         output_config_file = os.path.join(args.output_dir, CONFIG_NAME)
-
                         torch.save(model_to_save.state_dict(), output_model_file)
                         model_to_save.config.to_json_file(output_config_file)
                         tokenizer.save_vocabulary(args.output_dir)
@@ -1137,8 +1212,9 @@ def main():
                     student_model.train()
 
             
-
-    # wandb.finish()
+        if args.use_wandb:
+            run.summary["best_dev_acc"] = best_dev_acc
+            wandb.finish()
 
 
 if __name__ == "__main__":
@@ -1147,19 +1223,34 @@ if __name__ == "__main__":
     if args.use_wandb:
         if args.pred_distill:
             metric = {'goal': 'maximize', 'name': 'result[\'acc\']'}
+            sweep_configuration = {
+                'method': 'grid',
+                'name': args.runname,
+                'metric': metric,
+                'parameters': 
+                {
+                    'batch_size': {'values': [16, 32]},
+                    'lr': {'values': [1e-5, 2e-5, 3e-5]}
+                }
+                # {
+                #     'batch_size': {'values': [16]},
+                #     'lr': {'values': [1e-5]}
+                # }
+            }
         else:
             metric = {'goal': 'minimize', 'name': 'loss'}
-        sweep_configuration = {
-            'method': 'grid',
-            'name': args.wandb_runname,
-            'metric': metric,
-            'parameters': 
-            {
-                'batch_size': {'values': [32]},
-                'lr': {'values': [5e-5]}
-                # 'lr': {'values': [5e-3, 1e-3, 5e-4, 1e-4, 5e-5, 1e-5, 5e-6, 1e-6]}
+        
+            sweep_configuration = {
+                'method': 'grid',
+                'name': args.runname,
+                'metric': metric,
+                'parameters': 
+                {
+                    'batch_size': {'values': [32]},
+                    'lr': {'values': [5e-5]},
+                    'kl_attn_weight': {'values': [None, 5]},
+                }
             }
-        }
         sweep_id = wandb.sweep(sweep=sweep_configuration, project=f"csc2516_project-{args.task_name}")
         wandb.agent(sweep_id, function=main)
     else:

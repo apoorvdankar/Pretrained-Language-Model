@@ -1,0 +1,91 @@
+{
+    "os": "Linux-5.15.0-46-generic-x86_64-with-glibc2.35",
+    "python": "3.10.6",
+    "heartbeatAt": "2023-03-27T20:23:51.445042",
+    "startedAt": "2023-03-27T20:23:50.768761",
+    "docker": null,
+    "cuda": null,
+    "args": [
+        "--pred_distill",
+        "--teacher_model",
+        "/w/331/adeemj/csc2516_proj/models/CoLA/models--textattack--bert-base-uncased-CoLA/snapshots/5fed03dd6bc5f0b40e86cb04cd1a16eb404ba391/",
+        "--student_model",
+        "/w/331/adeemj/csc2516_proj/models/CoLA/KL_ATTN_BASE/TempTinyBERT_CoLA_4L_312D_5e-05_32",
+        "--data_dir",
+        "/w/331/adeemj/csc2516_proj/data/CoLA",
+        "--task_name",
+        "CoLA",
+        "--output_dir",
+        "/w/331/adeemj/csc2516_proj/models/CoLA/KL_ATTN_BASE/TinyBERT_CoLA_4L_312D_5e-05_32",
+        "--do_lower_case",
+        "--num_train_epochs",
+        "3",
+        "--max_seq_length",
+        "128",
+        "--learning_rate",
+        "3e-5",
+        "--train_batch_size",
+        "32",
+        "--use_wandb",
+        "--wandb_username",
+        "99adeem",
+        "--wandb_runname",
+        "KL_ATTN_BASE"
+    ],
+    "state": "running",
+    "program": "/w/331/adeemj/csc2516_proj/Pretrained-Language-Model/TinyBERT/task_distill.py",
+    "codePath": "TinyBERT/task_distill.py",
+    "git": {
+        "remote": "https://github.com/apoorvdankar/Pretrained-Language-Model.git",
+        "commit": "448958346c0f4922726665a6e1245732903d27dd"
+    },
+    "email": null,
+    "root": "/w/331/adeemj/csc2516_proj/Pretrained-Language-Model",
+    "host": "gpunode26",
+    "username": "adeemj",
+    "executable": "/w/331/adeemj/csc2516_proj/myenv/bin/python3",
+    "cpu_count": 4,
+    "cpu_count_logical": 4,
+    "cpu_freq": {
+        "current": 3107.8112499999997,
+        "min": 800.0,
+        "max": 3600.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2658.482,
+            "min": 800.0,
+            "max": 3600.0
+        },
+        {
+            "current": 3600.0,
+            "min": 800.0,
+            "max": 3600.0
+        },
+        {
+            "current": 3600.0,
+            "min": 800.0,
+            "max": 3600.0
+        },
+        {
+            "current": 3600.0,
+            "min": 800.0,
+            "max": 3600.0
+        }
+    ],
+    "disk": {
+        "total": 453.6786880493164,
+        "used": 41.03955078125
+    },
+    "gpu": "NVIDIA GeForce RTX 2060",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "NVIDIA GeForce RTX 2060",
+            "memory_total": 6442450944
+        }
+    ],
+    "memory": {
+        "total": 15.471893310546875
+    }
+}

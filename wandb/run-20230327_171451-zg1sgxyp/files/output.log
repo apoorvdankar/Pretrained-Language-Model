@@ -1,0 +1,601 @@
+03/27 05:14:52 PM device: cuda n_gpu: 1
+USING KL ATTN LOSS WITH WEIGHT =  100.0
+03/27 05:14:52 PM Writing example 0 of 8551
+03/27 05:14:52 PM *** Example ***
+03/27 05:14:52 PM guid: train-0
+03/27 05:14:52 PM tokens: [CLS] our friends won ' t buy this analysis , let alone the next one we propose . [SEP]
+03/27 05:14:52 PM input_ids: 101 2256 2814 2180 1005 1056 4965 2023 4106 1010 2292 2894 1996 2279 2028 2057 16599 1012 102 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+03/27 05:14:52 PM input_mask: 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+03/27 05:14:52 PM segment_ids: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+03/27 05:14:52 PM label: 1
+03/27 05:14:52 PM label_id: 1
+03/27 05:14:53 PM Writing example 0 of 1043
+03/27 05:14:53 PM *** Example ***
+03/27 05:14:53 PM guid: dev-0
+03/27 05:14:53 PM tokens: [CLS] the sailors rode the breeze clear of the rocks . [SEP]
+03/27 05:14:53 PM input_ids: 101 1996 11279 8469 1996 9478 3154 1997 1996 5749 1012 102 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+03/27 05:14:53 PM input_mask: 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+03/27 05:14:53 PM segment_ids: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+03/27 05:14:53 PM label: 1
+03/27 05:14:53 PM label_id: 1
+03/27 05:14:53 PM loading archive file /w/331/adeemj/csc2516_proj/models/CoLA/models--textattack--bert-base-uncased-CoLA/snapshots/5fed03dd6bc5f0b40e86cb04cd1a16eb404ba391/
+03/27 05:14:53 PM Model config {
+  "architectures": [
+    "BertForSequenceClassification"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "finetuning_task": "cola",
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "layer_norm_eps": 1e-12,
+  "max_position_embeddings": 512,
+  "model_type": "bert",
+  "num_attention_heads": 12,
+  "num_hidden_layers": 12,
+  "pad_token_id": 0,
+  "pre_trained": "",
+  "training": "",
+  "type_vocab_size": 2,
+  "vocab_size": 30522
+}
+03/27 05:14:55 PM Loading model /w/331/adeemj/csc2516_proj/models/CoLA/models--textattack--bert-base-uncased-CoLA/snapshots/5fed03dd6bc5f0b40e86cb04cd1a16eb404ba391/pytorch_model.bin
+03/27 05:14:55 PM loading model...
+03/27 05:14:55 PM done!
+03/27 05:14:55 PM Weights of TinyBertForSequenceClassification not initialized from pretrained model: ['fit_dense.weight', 'fit_dense.bias']
+03/27 05:14:56 PM loading archive file /w/331/adeemj/csc2516_proj/models/models--huawei-noah--TinyBERT_General_4L_312D/snapshots/34707a33cd59a94ecde241ac209bf35103691b43/
+03/27 05:14:56 PM Model config {
+  "attention_probs_dropout_prob": 0.1,
+  "cell": {},
+  "emb_size": 312,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 312,
+  "initializer_range": 0.02,
+  "intermediate_size": 1200,
+  "max_position_embeddings": 512,
+  "model_type": "bert",
+  "num_attention_heads": 12,
+  "num_hidden_layers": 4,
+  "pre_trained": "",
+  "structure": [],
+  "training": "",
+  "type_vocab_size": 2,
+  "vocab_size": 30522
+}
+03/27 05:14:56 PM Loading model /w/331/adeemj/csc2516_proj/models/models--huawei-noah--TinyBERT_General_4L_312D/snapshots/34707a33cd59a94ecde241ac209bf35103691b43/pytorch_model.bin
+03/27 05:14:56 PM loading model...
+03/27 05:14:56 PM done!
+03/27 05:14:56 PM Weights of TinyBertForSequenceClassification not initialized from pretrained model: ['classifier.weight', 'classifier.bias', 'fit_dense.weight', 'fit_dense.bias']
+03/27 05:14:56 PM Weights from pretrained model not used in TinyBertForSequenceClassification: ['cls.predictions.bias', 'cls.predictions.transform.dense.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.decoder.weight', 'cls.seq_relationship.weight', 'cls.seq_relationship.bias', 'fit_denses.0.weight', 'fit_denses.0.bias', 'fit_denses.1.weight', 'fit_denses.1.bias', 'fit_denses.2.weight', 'fit_denses.2.bias', 'fit_denses.3.weight', 'fit_denses.3.bias', 'fit_denses.4.weight', 'fit_denses.4.bias']
+03/27 05:14:57 PM ***** Running training *****
+03/27 05:14:57 PM   Num examples = 8551
+03/27 05:14:57 PM   Batch size = 32
+03/27 05:14:57 PM   Num steps = 8010
+03/27 05:14:57 PM n: bert.embeddings.word_embeddings.weight
+03/27 05:14:57 PM n: bert.embeddings.position_embeddings.weight
+03/27 05:14:57 PM n: bert.embeddings.token_type_embeddings.weight
+03/27 05:14:57 PM n: bert.embeddings.LayerNorm.weight
+03/27 05:14:57 PM n: bert.embeddings.LayerNorm.bias
+03/27 05:14:57 PM n: bert.encoder.layer.0.attention.self.query.weight
+03/27 05:14:57 PM n: bert.encoder.layer.0.attention.self.query.bias
+03/27 05:14:57 PM n: bert.encoder.layer.0.attention.self.key.weight
+03/27 05:14:57 PM n: bert.encoder.layer.0.attention.self.key.bias
+03/27 05:14:57 PM n: bert.encoder.layer.0.attention.self.value.weight
+03/27 05:14:57 PM n: bert.encoder.layer.0.attention.self.value.bias
+03/27 05:14:57 PM n: bert.encoder.layer.0.attention.output.dense.weight
+03/27 05:14:57 PM n: bert.encoder.layer.0.attention.output.dense.bias
+03/27 05:14:57 PM n: bert.encoder.layer.0.attention.output.LayerNorm.weight
+03/27 05:14:57 PM n: bert.encoder.layer.0.attention.output.LayerNorm.bias
+03/27 05:14:57 PM n: bert.encoder.layer.0.intermediate.dense.weight
+03/27 05:14:57 PM n: bert.encoder.layer.0.intermediate.dense.bias
+03/27 05:14:57 PM n: bert.encoder.layer.0.output.dense.weight
+03/27 05:14:57 PM n: bert.encoder.layer.0.output.dense.bias
+03/27 05:14:57 PM n: bert.encoder.layer.0.output.LayerNorm.weight
+03/27 05:14:57 PM n: bert.encoder.layer.0.output.LayerNorm.bias
+03/27 05:14:57 PM n: bert.encoder.layer.1.attention.self.query.weight
+03/27 05:14:57 PM n: bert.encoder.layer.1.attention.self.query.bias
+03/27 05:14:57 PM n: bert.encoder.layer.1.attention.self.key.weight
+03/27 05:14:57 PM n: bert.encoder.layer.1.attention.self.key.bias
+03/27 05:14:57 PM n: bert.encoder.layer.1.attention.self.value.weight
+03/27 05:14:57 PM n: bert.encoder.layer.1.attention.self.value.bias
+03/27 05:14:57 PM n: bert.encoder.layer.1.attention.output.dense.weight
+03/27 05:14:57 PM n: bert.encoder.layer.1.attention.output.dense.bias
+03/27 05:14:57 PM n: bert.encoder.layer.1.attention.output.LayerNorm.weight
+03/27 05:14:57 PM n: bert.encoder.layer.1.attention.output.LayerNorm.bias
+03/27 05:14:57 PM n: bert.encoder.layer.1.intermediate.dense.weight
+03/27 05:14:57 PM n: bert.encoder.layer.1.intermediate.dense.bias
+03/27 05:14:57 PM n: bert.encoder.layer.1.output.dense.weight
+03/27 05:14:57 PM n: bert.encoder.layer.1.output.dense.bias
+03/27 05:14:57 PM n: bert.encoder.layer.1.output.LayerNorm.weight
+03/27 05:14:57 PM n: bert.encoder.layer.1.output.LayerNorm.bias
+03/27 05:14:57 PM n: bert.encoder.layer.2.attention.self.query.weight
+03/27 05:14:57 PM n: bert.encoder.layer.2.attention.self.query.bias
+03/27 05:14:57 PM n: bert.encoder.layer.2.attention.self.key.weight
+03/27 05:14:57 PM n: bert.encoder.layer.2.attention.self.key.bias
+03/27 05:14:57 PM n: bert.encoder.layer.2.attention.self.value.weight
+03/27 05:14:57 PM n: bert.encoder.layer.2.attention.self.value.bias
+03/27 05:14:57 PM n: bert.encoder.layer.2.attention.output.dense.weight
+03/27 05:14:57 PM n: bert.encoder.layer.2.attention.output.dense.bias
+03/27 05:14:57 PM n: bert.encoder.layer.2.attention.output.LayerNorm.weight
+03/27 05:14:57 PM n: bert.encoder.layer.2.attention.output.LayerNorm.bias
+03/27 05:14:57 PM n: bert.encoder.layer.2.intermediate.dense.weight
+03/27 05:14:57 PM n: bert.encoder.layer.2.intermediate.dense.bias
+03/27 05:14:57 PM n: bert.encoder.layer.2.output.dense.weight
+03/27 05:14:57 PM n: bert.encoder.layer.2.output.dense.bias
+03/27 05:14:57 PM n: bert.encoder.layer.2.output.LayerNorm.weight
+03/27 05:14:57 PM n: bert.encoder.layer.2.output.LayerNorm.bias
+03/27 05:14:57 PM n: bert.encoder.layer.3.attention.self.query.weight
+03/27 05:14:57 PM n: bert.encoder.layer.3.attention.self.query.bias
+03/27 05:14:57 PM n: bert.encoder.layer.3.attention.self.key.weight
+03/27 05:14:57 PM n: bert.encoder.layer.3.attention.self.key.bias
+03/27 05:14:57 PM n: bert.encoder.layer.3.attention.self.value.weight
+03/27 05:14:57 PM n: bert.encoder.layer.3.attention.self.value.bias
+03/27 05:14:57 PM n: bert.encoder.layer.3.attention.output.dense.weight
+03/27 05:14:57 PM n: bert.encoder.layer.3.attention.output.dense.bias
+03/27 05:14:57 PM n: bert.encoder.layer.3.attention.output.LayerNorm.weight
+03/27 05:14:57 PM n: bert.encoder.layer.3.attention.output.LayerNorm.bias
+03/27 05:14:57 PM n: bert.encoder.layer.3.intermediate.dense.weight
+03/27 05:14:57 PM n: bert.encoder.layer.3.intermediate.dense.bias
+03/27 05:14:57 PM n: bert.encoder.layer.3.output.dense.weight
+03/27 05:14:57 PM n: bert.encoder.layer.3.output.dense.bias
+03/27 05:14:57 PM n: bert.encoder.layer.3.output.LayerNorm.weight
+03/27 05:14:57 PM n: bert.encoder.layer.3.output.LayerNorm.bias
+03/27 05:14:57 PM n: bert.pooler.dense.weight
+03/27 05:14:57 PM n: bert.pooler.dense.bias
+03/27 05:14:57 PM n: classifier.weight
+03/27 05:14:57 PM n: classifier.bias
+03/27 05:14:57 PM n: fit_dense.weight
+03/27 05:14:57 PM n: fit_dense.bias
+03/27 05:14:57 PM Total parameters: 14591258
+Epoch:   0%|          | 0/30 [00:00<?, ?it/s]     /w/331/adeemj/csc2516_proj/Pretrained-Language-Model/TinyBERT/transformer/optimization.py:275: UserWarning: This overload of add_ is deprecated:
+	add_(Number alpha, Tensor other) [00:00<?, ?it/s]
+Consider using one of the following signatures instead:
+	add_(Tensor other, *, Number alpha) (Triggered internally at ../torch/csrc/utils/python_arg_parser.cpp:1485.)
+  next_m.mul_(beta1).add_(1 - beta1, grad)
+
+
+
+
+
+
+Iteration:  17%|#7        | 46/268 [00:13<01:01,  3.62it/s]
+03/27 05:15:11 PM ***** Running evaluation *****
+03/27 05:15:11 PM   Epoch = 0 iter 49 step
+03/27 05:15:11 PM   Num examples = 1043
+03/27 05:15:11 PM   Batch size = 32
+03/27 05:15:11 PM ***** Eval results *****
+03/27 05:15:11 PM   att_loss = 87931.29145408163
+03/27 05:15:11 PM   cls_loss = 0.0
+03/27 05:15:11 PM   global_step = 49
+03/27 05:15:11 PM   loss = 87932.94339923469
+03/27 05:15:11 PM   rep_loss = 1.6513117430161457
+
+
+
+
+
+
+
+Iteration:  35%|###5      | 95/268 [00:27<00:48,  3.60it/s]
+03/27 05:15:25 PM ***** Running evaluation *****
+03/27 05:15:25 PM   Epoch = 0 iter 99 step
+03/27 05:15:25 PM   Num examples = 1043
+03/27 05:15:25 PM   Batch size = 32
+03/27 05:15:25 PM ***** Eval results *****
+03/27 05:15:25 PM   att_loss = 81003.76309974748
+03/27 05:15:25 PM   cls_loss = 0.0
+03/27 05:15:25 PM   global_step = 99
+03/27 05:15:25 PM   loss = 81005.23358585859
+03/27 05:15:25 PM   rep_loss = 1.4703123858480742
+
+
+
+
+
+
+
+Iteration:  53%|#####3    | 143/268 [00:41<00:34,  3.59it/s]
+03/27 05:15:40 PM ***** Running evaluation *****
+03/27 05:15:40 PM   Epoch = 0 iter 149 step
+03/27 05:15:40 PM   Num examples = 1043
+03/27 05:15:40 PM   Batch size = 32
+03/27 05:15:40 PM ***** Eval results *****
+03/27 05:15:40 PM   att_loss = 77320.39518666107
+03/27 05:15:40 PM   cls_loss = 0.0
+03/27 05:15:40 PM   global_step = 149
+03/27 05:15:40 PM   loss = 77321.76995071309
+03/27 05:15:40 PM   rep_loss = 1.3747404909773961
+
+
+
+
+
+
+
+
+Iteration:  74%|#######3  | 198/268 [00:57<00:19,  3.55it/s]
+03/27 05:15:54 PM ***** Running evaluation *****
+03/27 05:15:54 PM   Epoch = 0 iter 199 step
+03/27 05:15:54 PM   Num examples = 1043
+03/27 05:15:54 PM   Batch size = 32
+03/27 05:15:54 PM ***** Eval results *****
+03/27 05:15:54 PM   att_loss = 75214.95997565954
+03/27 05:15:54 PM   cls_loss = 0.0
+03/27 05:15:54 PM   global_step = 199
+03/27 05:15:54 PM   loss = 75216.27066975503
+03/27 05:15:54 PM   rep_loss = 1.3108177125154428
+
+
+
+
+
+
+
+Iteration:  91%|#########1| 245/268 [01:11<00:06,  3.57it/s]
+03/27 05:16:09 PM ***** Running evaluation *****
+03/27 05:16:09 PM   Epoch = 0 iter 249 step
+03/27 05:16:09 PM   Num examples = 1043
+03/27 05:16:09 PM   Batch size = 32
+03/27 05:16:09 PM ***** Eval results *****
+03/27 05:16:09 PM   att_loss = 73815.35584525602
+03/27 05:16:09 PM   cls_loss = 0.0
+03/27 05:16:09 PM   global_step = 249
+03/27 05:16:09 PM   loss = 73816.61985441767
+03/27 05:16:09 PM   rep_loss = 1.2641592231620267
+
+
+
+Epoch:   3%|▎         | 1/30 [01:18<37:49, 78.26s/it]57it/s]
+
+
+
+Iteration:  10%|9         | 26/268 [00:07<01:07,  3.56it/s]
+03/27 05:16:24 PM ***** Running evaluation *****
+03/27 05:16:24 PM   Epoch = 1 iter 299 step
+03/27 05:16:24 PM   Num examples = 1043
+03/27 05:16:24 PM   Batch size = 32
+03/27 05:16:24 PM ***** Eval results *****
+03/27 05:16:24 PM   att_loss = 67201.44909667969
+03/27 05:16:24 PM   cls_loss = 0.0
+03/27 05:16:24 PM   global_step = 299
+03/27 05:16:24 PM   loss = 67202.47998046875
+03/27 05:16:24 PM   rep_loss = 1.03079491853714
+
+
+
+
+
+
+
+
+Iteration:  30%|##9       | 80/268 [00:23<00:52,  3.55it/s]
+03/27 05:16:39 PM ***** Running evaluation *****
+03/27 05:16:39 PM   Epoch = 1 iter 349 step
+03/27 05:16:39 PM   Num examples = 1043
+03/27 05:16:39 PM   Batch size = 32
+03/27 05:16:39 PM ***** Eval results *****
+03/27 05:16:39 PM   att_loss = 66847.08555640244
+03/27 05:16:39 PM   cls_loss = 0.0
+03/27 05:16:39 PM   global_step = 349
+03/27 05:16:39 PM   loss = 66848.09846608232
+03/27 05:16:39 PM   rep_loss = 1.0131130756401434
+
+
+
+
+
+
+
+Iteration:  48%|####7     | 128/268 [00:37<00:39,  3.55it/s]
+03/27 05:16:53 PM ***** Running evaluation *****
+03/27 05:16:53 PM   Epoch = 1 iter 399 step
+03/27 05:16:53 PM   Num examples = 1043
+03/27 05:16:53 PM   Batch size = 32
+03/27 05:16:53 PM ***** Eval results *****
+03/27 05:16:53 PM   att_loss = 66627.01532907198
+03/27 05:16:53 PM   cls_loss = 0.0
+03/27 05:16:53 PM   global_step = 399
+03/27 05:16:53 PM   loss = 66628.01473721591
+03/27 05:16:53 PM   rep_loss = 0.9995790575489854
+
+
+
+
+
+
+
+
+Iteration:  68%|######7   | 181/268 [00:53<00:24,  3.50it/s]
+03/27 05:17:08 PM ***** Running evaluation *****
+03/27 05:17:08 PM   Epoch = 1 iter 449 step
+03/27 05:17:08 PM   Num examples = 1043
+03/27 05:17:08 PM   Batch size = 32
+03/27 05:17:08 PM ***** Eval results *****
+03/27 05:17:08 PM   att_loss = 66578.13800652472
+03/27 05:17:08 PM   cls_loss = 0.0
+03/27 05:17:08 PM   global_step = 449
+03/27 05:17:08 PM   loss = 66579.12549364698
+03/27 05:17:08 PM   rep_loss = 0.9876524223076119
+
+
+
+
+
+
+
+Iteration:  85%|########5 | 229/268 [01:07<00:11,  3.53it/s]
+03/27 05:17:23 PM ***** Running evaluation *****
+03/27 05:17:23 PM   Epoch = 1 iter 499 step
+03/27 05:17:23 PM   Num examples = 1043
+03/27 05:17:23 PM   Batch size = 32
+03/27 05:17:23 PM ***** Eval results *****
+03/27 05:17:23 PM   att_loss = 66222.681640625
+03/27 05:17:23 PM   cls_loss = 0.0
+03/27 05:17:23 PM   global_step = 499
+03/27 05:17:23 PM   loss = 66223.65645204742
+03/27 05:17:23 PM   rep_loss = 0.9749656119223299
+
+
+
+
+
+Epoch:   7%|▋         | 2/30 [02:36<36:39, 78.54s/it]54it/s]
+
+Iteration:   3%|3         | 9/268 [00:02<01:13,  3.53it/s]
+03/27 05:17:38 PM ***** Running evaluation *****
+03/27 05:17:38 PM   Epoch = 2 iter 549 step
+03/27 05:17:38 PM   Num examples = 1043
+03/27 05:17:38 PM   Batch size = 32
+03/27 05:17:38 PM ***** Eval results *****
+03/27 05:17:38 PM   att_loss = 62684.85364583333
+03/27 05:17:38 PM   cls_loss = 0.0
+03/27 05:17:38 PM   global_step = 549
+03/27 05:17:38 PM   loss = 62685.74947916667
+03/27 05:17:38 PM   rep_loss = 0.8955575903256734
+
+
+
+
+
+
+
+
+Iteration:  23%|##3       | 62/268 [00:18<00:58,  3.53it/s]
+03/27 05:17:53 PM ***** Running evaluation *****
+03/27 05:17:53 PM   Epoch = 2 iter 599 step
+03/27 05:17:53 PM   Num examples = 1043
+03/27 05:17:53 PM   Batch size = 32
+03/27 05:17:53 PM ***** Eval results *****
+03/27 05:17:53 PM   att_loss = 64007.72692307692
+03/27 05:17:53 PM   cls_loss = 0.0
+03/27 05:17:53 PM   global_step = 599
+03/27 05:17:53 PM   loss = 64008.62127403846
+03/27 05:17:53 PM   rep_loss = 0.8944675986583416
+
+
+
+
+
+
+
+
+Iteration:  43%|####2     | 114/268 [00:34<00:43,  3.54it/s]
+03/27 05:18:08 PM ***** Running evaluation *****
+03/27 05:18:08 PM   Epoch = 2 iter 649 step
+03/27 05:18:08 PM   Num examples = 1043
+03/27 05:18:08 PM   Batch size = 32
+03/27 05:18:08 PM ***** Eval results *****
+03/27 05:18:08 PM   att_loss = 63687.09507472826
+03/27 05:18:08 PM   cls_loss = 0.0
+03/27 05:18:08 PM   global_step = 649
+03/27 05:18:08 PM   loss = 63687.98138586956
+03/27 05:18:08 PM   rep_loss = 0.886397311480149
+
+
+
+
+
+
+
+Iteration:  61%|######    | 163/268 [00:48<00:29,  3.53it/s]
+03/27 05:18:23 PM ***** Running evaluation *****
+03/27 05:18:23 PM   Epoch = 2 iter 699 step
+03/27 05:18:23 PM   Num examples = 1043
+03/27 05:18:23 PM   Batch size = 32
+03/27 05:18:23 PM ***** Eval results *****
+03/27 05:18:23 PM   att_loss = 63858.153622159094
+03/27 05:18:23 PM   cls_loss = 0.0
+03/27 05:18:23 PM   global_step = 699
+03/27 05:18:23 PM   loss = 63859.03475378788
+03/27 05:18:23 PM   rep_loss = 0.881149757269657
+
+
+
+
+
+
+
+Iteration:  78%|#######8  | 210/268 [01:02<00:16,  3.53it/s]
+03/27 05:18:38 PM ***** Running evaluation *****
+03/27 05:18:38 PM   Epoch = 2 iter 749 step
+03/27 05:18:38 PM   Num examples = 1043
+03/27 05:18:38 PM   Batch size = 32
+03/27 05:18:38 PM ***** Eval results *****
+03/27 05:18:38 PM   att_loss = 63967.00650436046
+03/27 05:18:38 PM   cls_loss = 0.0
+03/27 05:18:38 PM   global_step = 749
+03/27 05:18:38 PM   loss = 63967.88168604651
+03/27 05:18:38 PM   rep_loss = 0.8752815651339154
+
+
+
+
+
+
+
+
+Iteration:  99%|#########8| 264/268 [01:18<00:01,  3.53it/s]
+03/27 05:18:52 PM ***** Running evaluation *****
+03/27 05:18:52 PM   Epoch = 2 iter 799 step
+03/27 05:18:52 PM   Num examples = 1043
+03/27 05:18:52 PM   Batch size = 32
+03/27 05:18:52 PM ***** Eval results *****
+03/27 05:18:52 PM   att_loss = 63787.399380896226
+03/27 05:18:52 PM   cls_loss = 0.0
+03/27 05:18:52 PM   global_step = 799
+03/27 05:18:52 PM   loss = 63788.26789504717
+03/27 05:18:52 PM   rep_loss = 0.8685840433498598
+Epoch:  10%|█         | 3/30 [03:57<35:41, 79.31s/it]62it/s]
+
+
+
+
+
+
+Iteration:  16%|#6        | 44/268 [00:12<01:03,  3.52it/s]
+03/27 05:19:07 PM ***** Running evaluation *****
+03/27 05:19:07 PM   Epoch = 3 iter 849 step
+03/27 05:19:07 PM   Num examples = 1043
+03/27 05:19:07 PM   Batch size = 32
+03/27 05:19:07 PM ***** Eval results *****
+03/27 05:19:07 PM   att_loss = 61943.833333333336
+03/27 05:19:07 PM   cls_loss = 0.0
+03/27 05:19:07 PM   global_step = 849
+03/27 05:19:07 PM   loss = 61944.658528645836
+03/27 05:19:07 PM   rep_loss = 0.8253672048449516
+
+
+
+
+
+
+
+
+Iteration:  36%|###6      | 97/268 [00:28<00:48,  3.53it/s]
+03/27 05:19:22 PM ***** Running evaluation *****
+03/27 05:19:22 PM   Epoch = 3 iter 899 step
+03/27 05:19:22 PM   Num examples = 1043
+03/27 05:19:22 PM   Batch size = 32
+03/27 05:19:22 PM ***** Eval results *****
+03/27 05:19:22 PM   att_loss = 62359.498804209186
+03/27 05:19:22 PM   cls_loss = 0.0
+03/27 05:19:22 PM   global_step = 899
+03/27 05:19:22 PM   loss = 62360.3209502551
+03/27 05:19:22 PM   rep_loss = 0.8220250278103108
+
+
+
+
+
+
+
+Iteration:  54%|#####4    | 145/268 [00:42<00:34,  3.52it/s]
+03/27 05:19:37 PM ***** Running evaluation *****
+03/27 05:19:37 PM   Epoch = 3 iter 949 step
+03/27 05:19:37 PM   Num examples = 1043
+03/27 05:19:37 PM   Batch size = 32
+03/27 05:19:37 PM ***** Eval results *****
+03/27 05:19:37 PM   att_loss = 62623.11248944257
+03/27 05:19:37 PM   cls_loss = 0.0
+03/27 05:19:37 PM   global_step = 949
+03/27 05:19:37 PM   loss = 62623.93179898649
+03/27 05:19:37 PM   rep_loss = 0.8191265238297952
+
+
+
+
+
+
+
+Iteration:  72%|#######1  | 192/268 [00:56<00:21,  3.52it/s]
+03/27 05:19:52 PM ***** Running evaluation *****
+03/27 05:19:52 PM   Epoch = 3 iter 999 step
+03/27 05:19:52 PM   Num examples = 1043
+03/27 05:19:52 PM   Batch size = 32
+03/27 05:19:52 PM ***** Eval results *****
+03/27 05:19:52 PM   att_loss = 62429.35661300505
+03/27 05:19:52 PM   cls_loss = 0.0
+03/27 05:19:52 PM   global_step = 999
+03/27 05:19:52 PM   loss = 62430.17116477273
+03/27 05:19:52 PM   rep_loss = 0.8144021771772944
+
+
+
+
+
+
+
+
+Iteration:  92%|#########1| 246/268 [01:12<00:06,  3.52it/s]
+03/27 05:20:07 PM ***** Running evaluation *****
+03/27 05:20:07 PM   Epoch = 3 iter 1049 step
+03/27 05:20:07 PM   Num examples = 1043
+03/27 05:20:07 PM   Batch size = 32
+03/27 05:20:07 PM ***** Eval results *****
+03/27 05:20:07 PM   att_loss = 62496.59581338205
+03/27 05:20:07 PM   cls_loss = 0.0
+03/27 05:20:07 PM   global_step = 1049
+03/27 05:20:07 PM   loss = 62497.40717930948
+03/27 05:20:07 PM   rep_loss = 0.8112194701548545
+
+
+
+Epoch:  13%|█▎        | 4/30 [05:16<34:21, 79.29s/it]47it/s]
+
+
+
+Iteration:  10%|9         | 26/268 [00:07<01:08,  3.52it/s]
+03/27 05:20:22 PM ***** Running evaluation *****
+03/27 05:20:22 PM   Epoch = 4 iter 1099 step
+03/27 05:20:22 PM   Num examples = 1043
+03/27 05:20:22 PM   Batch size = 32
+03/27 05:20:22 PM ***** Eval results *****
+03/27 05:20:22 PM   att_loss = 61596.19417842742
+03/27 05:20:22 PM   cls_loss = 0.0
+03/27 05:20:22 PM   global_step = 1099
+03/27 05:20:22 PM   loss = 61596.98361895161
+03/27 05:20:22 PM   rep_loss = 0.7891431220116154
+
+
+
+
+
+
+
+
+Iteration:  30%|##9       | 80/268 [00:23<00:53,  3.52it/s]
+03/27 05:20:37 PM ***** Running evaluation *****
+03/27 05:20:37 PM   Epoch = 4 iter 1149 step
+03/27 05:20:37 PM   Num examples = 1043
+03/27 05:20:37 PM   Batch size = 32
+03/27 05:20:37 PM ***** Eval results *****
+03/27 05:20:37 PM   att_loss = 61808.39988425926
+03/27 05:20:37 PM   cls_loss = 0.0
+03/27 05:20:37 PM   global_step = 1149
+03/27 05:20:37 PM   loss = 61809.18711419753
+03/27 05:20:37 PM   rep_loss = 0.7873016684143631
+
+
+
+
+
+
+
+Iteration:  47%|####7     | 127/268 [00:37<00:40,  3.51it/s]
+03/27 05:20:52 PM ***** Running evaluation *****
+03/27 05:20:52 PM   Epoch = 4 iter 1199 step
+03/27 05:20:52 PM   Num examples = 1043
+03/27 05:20:52 PM   Batch size = 32
+03/27 05:20:52 PM ***** Eval results *****
+03/27 05:20:52 PM   att_loss = 61505.06989503817
+03/27 05:20:52 PM   cls_loss = 0.0
+03/27 05:20:52 PM   global_step = 1199
+03/27 05:20:52 PM   loss = 61505.853083253816
+03/27 05:20:52 PM   rep_loss = 0.7831872979193243
+
+
+
+Epoch:  13%|█▎        | 4/30 [05:58<38:50, 89.65s/it]14it/s]

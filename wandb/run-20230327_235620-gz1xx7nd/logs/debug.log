@@ -1,0 +1,33 @@
+2023-03-27 23:56:20,829 INFO    Thread-6 (_run_job):1944398 [wandb_setup.py:_flush():76] Configure stats pid to 1944398
+2023-03-27 23:56:20,829 INFO    Thread-6 (_run_job):1944398 [wandb_setup.py:_flush():76] Loading settings from /u/adeemj/.config/wandb/settings
+2023-03-27 23:56:20,829 INFO    Thread-6 (_run_job):1944398 [wandb_setup.py:_flush():76] Loading settings from /w/331/adeemj/csc2516_proj/Pretrained-Language-Model/wandb/settings
+2023-03-27 23:56:20,829 INFO    Thread-6 (_run_job):1944398 [wandb_setup.py:_flush():76] Loading settings from environment variables: {'project': 'csc2516_project-CoLA', 'entity': '99adeem', 'root_dir': '/w/331/adeemj/csc2516_proj/Pretrained-Language-Model', 'run_id': 'gz1xx7nd', 'sweep_param_path': '/w/331/adeemj/csc2516_proj/Pretrained-Language-Model/wandb/sweep-3ge242ba/config-gz1xx7nd.yaml', 'sweep_id': '3ge242ba'}
+2023-03-27 23:56:20,829 INFO    Thread-6 (_run_job):1944398 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2023-03-27 23:56:20,829 INFO    Thread-6 (_run_job):1944398 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'TinyBERT/task_distill.py', 'program': '/w/331/adeemj/csc2516_proj/Pretrained-Language-Model/TinyBERT/task_distill.py'}
+2023-03-27 23:56:20,829 INFO    Thread-6 (_run_job):1944398 [wandb_init.py:_log_setup():506] Logging user logs to /w/331/adeemj/csc2516_proj/Pretrained-Language-Model/wandb/run-20230327_235620-gz1xx7nd/logs/debug.log
+2023-03-27 23:56:20,830 INFO    Thread-6 (_run_job):1944398 [wandb_init.py:_log_setup():507] Logging internal logs to /w/331/adeemj/csc2516_proj/Pretrained-Language-Model/wandb/run-20230327_235620-gz1xx7nd/logs/debug-internal.log
+2023-03-27 23:56:20,830 INFO    Thread-6 (_run_job):1944398 [wandb_init.py:init():546] calling init triggers
+2023-03-27 23:56:20,830 INFO    Thread-6 (_run_job):1944398 [wandb_init.py:init():552] wandb.init called with sweep_config: {'batch_size': 16, 'lr': 2e-05}
+config: {}
+2023-03-27 23:56:20,831 INFO    Thread-6 (_run_job):1944398 [wandb_init.py:init():602] starting backend
+2023-03-27 23:56:20,831 INFO    Thread-6 (_run_job):1944398 [wandb_init.py:init():606] setting up manager
+2023-03-27 23:56:20,849 INFO    Thread-6 (_run_job):1944398 [backend.py:_multiprocessing_setup():106] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2023-03-27 23:56:20,867 INFO    Thread-6 (_run_job):1944398 [wandb_init.py:init():613] backend started and connected
+2023-03-27 23:56:20,886 INFO    Thread-6 (_run_job):1944398 [wandb_run.py:_config_callback():1251] config_cb None None {'batch_size': 16, 'lr': 2e-05}
+2023-03-27 23:56:20,888 INFO    Thread-6 (_run_job):1944398 [wandb_init.py:init():701] updated telemetry
+2023-03-27 23:56:20,911 INFO    Thread-6 (_run_job):1944398 [wandb_init.py:init():741] communicating run to backend with 60.0 second timeout
+2023-03-27 23:56:21,283 INFO    Thread-6 (_run_job):1944398 [wandb_run.py:_on_init():2133] communicating current version
+2023-03-27 23:56:21,487 INFO    Thread-6 (_run_job):1944398 [wandb_run.py:_on_init():2142] got version response 
+2023-03-27 23:56:21,487 INFO    Thread-6 (_run_job):1944398 [wandb_init.py:init():789] starting run threads in backend
+2023-03-27 23:56:21,626 INFO    Thread-6 (_run_job):1944398 [wandb_run.py:_console_start():2114] atexit reg
+2023-03-27 23:56:21,627 INFO    Thread-6 (_run_job):1944398 [wandb_run.py:_redirect():1969] redirect: SettingsConsole.WRAP_RAW
+2023-03-27 23:56:21,627 INFO    Thread-6 (_run_job):1944398 [wandb_run.py:_redirect():2034] Wrapping output streams.
+2023-03-27 23:56:21,627 INFO    Thread-6 (_run_job):1944398 [wandb_run.py:_redirect():2059] Redirects installed.
+2023-03-27 23:56:21,628 INFO    Thread-6 (_run_job):1944398 [wandb_init.py:init():831] run started, returning control to user process
+2023-03-27 23:56:21,628 INFO    Thread-6 (_run_job):1944398 [wandb_run.py:_finish():1854] finishing run 99adeem/csc2516_project-CoLA/gz1xx7nd
+2023-03-27 23:56:21,628 INFO    Thread-6 (_run_job):1944398 [wandb_run.py:_atexit_cleanup():2083] got exitcode: 1
+2023-03-27 23:56:21,628 INFO    Thread-6 (_run_job):1944398 [wandb_run.py:_restore():2066] restore
+2023-03-27 23:56:21,628 INFO    Thread-6 (_run_job):1944398 [wandb_run.py:_restore():2072] restore done
+2023-03-27 23:56:24,808 INFO    Thread-6 (_run_job):1944398 [wandb_run.py:_footer_history_summary_info():3422] rendering history
+2023-03-27 23:56:24,809 INFO    Thread-6 (_run_job):1944398 [wandb_run.py:_footer_history_summary_info():3454] rendering summary
+2023-03-27 23:56:24,818 INFO    Thread-6 (_run_job):1944398 [wandb_run.py:_footer_sync_info():3380] logging synced files
