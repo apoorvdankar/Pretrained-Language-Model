@@ -1,3 +1,30 @@
+KL Divergence Configuration
+===========================
+To use KL divergence instead of the base attention loss (MSE), modify the sweep configuration in the `main` function. Set the `kl_attn_weight` parameter to the desired weight for the KL loss. If you want to use the base attention loss (MSE), set the `kl_attn_weight` to `None`. The relevant section of the code is as follows:
+
+if __name__ == "__main__":
+
+    args = parse_arguments()
+    if args.use_wandb:
+        if args.pred_distill:
+            ...
+        else:
+            metric = {'goal': 'minimize', 'name': 'loss'}
+
+            sweep_configuration = {
+                'method': 'grid',
+                'name': args.runname,
+                'metric': metric,
+                'parameters': 
+                {
+                    'batch_size': {'values': [32]},
+                    'lr': {'values': [5e-5]},
+                    'kl_attn_weight': {'values': [None, 5]},
+                }
+            }
+        ...
+
+
 TinyBERT
 ======== 
 TinyBERT is 7.5x smaller and 9.4x faster on inference than BERT-base and achieves competitive performances in the tasks of natural language understanding. It performs a novel transformer distillation at both the pre-training and task-specific learning stages. The overview of TinyBERT learning is illustrated as follows: 
