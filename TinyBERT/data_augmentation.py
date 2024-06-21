@@ -22,7 +22,7 @@ import re
 import logging
 import csv
 import argparse
-
+from tqdm import tqdm
 
 import torch
 import numpy as np
@@ -219,7 +219,7 @@ class DataAugmentor(object):
         for (idx, word) in enumerate(tokens):
             if _is_valid(word) and word.lower() not in StopWordsList:
                 candidate_words[idx] = self._word_augment(sent, idx, word)
-        logger.info(candidate_words)
+        # logger.info(candidate_words)
         cnt = 0
         while cnt < self.N:
             new_sent = list(tokens)
@@ -260,7 +260,7 @@ class AugmentProcessor(object):
 
         with open(output_filename, 'w', newline='', encoding="utf-8") as f:
             writer = csv.writer(f, delimiter="\t")
-            for (i, line) in enumerate(train_samples):
+            for (i, line) in enumerate(tqdm(train_samples)):
                 if i == 0 and filter_flag:
                     writer.writerow(line)
                     continue
@@ -305,7 +305,7 @@ def main():
         "STS-b": {"N": 30},
         "QQP": {"N": 10},
         "QNLI": {"N": 20},
-        "RTE": {"N": 30}
+        "RTE": {"N": 20}
     }
 
     if args.task_name in default_params:
